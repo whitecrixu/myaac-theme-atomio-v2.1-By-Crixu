@@ -3,7 +3,13 @@
 **Preview:**  
 🌐 https://wolfots.online/
 
+
 ---
+## How install:
+   1. Install myaac from my repository <br>
+   https://github.com/whitecrixu/myaac-15.xx <br>
+   2.Go to plugins and install theme <br>
+   3.Continue with tutorial
 
 ## ⚙️ Requirements
 
