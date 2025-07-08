@@ -17,6 +17,74 @@ To make this theme work properly, you need the animated outfit system (for boost
 
 ---
 
+## Serwer uptime and events
+
+To make this work correctly on your server, you need to create a Lua script responsible for saving the server's start time to a file.
+
+In /data/scripts/globalevents, create a file called uptime.lua:
+```bash
+local uptimeFile = "data/uptime.txt"
+-- Save the time when the server (and this script) started
+local serverStartTime = os.time()
+
+local saveUptimeEvent = GlobalEvent("SaveUptime")
+
+function saveUptimeEvent.onThink(interval)
+    -- Calculate uptime as the number of seconds since server/script start
+    local uptime = os.time() - serverStartTime
+    -- Try to open (or create) the file and write uptime
+    local ok, err = pcall(function()
+        local file = io.open(uptimeFile, "w")
+        if file then
+            file:write(uptime)
+            file:close()
+        else
+            print("[SaveUptime] Cannot create or write to file: " .. uptimeFile)
+        end
+    end)
+    if not ok then
+        print("[SaveUptime] Error writing uptime: " .. tostring(err))
+    end
+    return true
+end
+
+-- Run this event every 60 seconds (60000 ms)
+saveUptimeEvent:interval(60000)
+saveUptimeEvent:register()
+```
+
+And change in the file 01-status.php:
+```bash 
+function getUptimeFromFile($path = '/home/USER/server/data/uptime.txt') { --change for you locatio
+    if (file_exists($path)) {
+        $seconds = (int)trim(file_get_contents($path));
+        return $seconds > 0 ? $seconds : null;
+    }
+    return null;
+}
+
+$online = isServerOnline();
+
+// Switch to reading from the file!
+$uptimeSeconds = null;
+if ($online) {
+    $uptimeSeconds = getUptimeFromFile('/home/USER/server/data/uptime.txt'); --change for you location
+}
+```
+
+and change in file 03-event.php
+```bash 
+function getUptimeFromFile($path = '/home/USER/server/data/uptime.txt') { --change for you location
+    if (file_exists($path)) {
+        $seconds = (int)trim(file_get_contents($path));
+        return $seconds > 0 ? $seconds : null;
+    }
+    return null;
+}
+
+// Get the current server uptime in seconds
+$uptimeSeconds = getUptimeFromFile('/home/USER/server/data/uptime.txt'); --change for you location
+```
 ## 📥 Download and Install Animated Outfits
 
 1. Download the animated outfit package from:  
